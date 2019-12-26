@@ -1,0 +1,9 @@
+obj-y += am335x_chipdb.o 
+obj-y += hw_am335x_chipdb.o 
+obj-y += hw_am335x_chipdb_baseaddr.o 
+obj-y += hw_am335x_chipdb_interrupt.o
+obj-y += intc.o
+obj-y += clock.o
+obj-y += ddr.o
+obj-y += am335x_control.o 
+obj-y += am335x_prcm.o
