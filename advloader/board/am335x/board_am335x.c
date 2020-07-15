@@ -304,7 +304,7 @@ static void  board_power_init(void){
 		CONSOLEUtilsPrintf(" Set MPU volatage failed r\n");
 		return;	
 	}
-	
+	setup_mpu_pll();
 	/* Second, update the CORE voltage. */
 	retVal = PMICSetRailVoltage(PMIC_MODULE_CORE, 
 				PMICGetMpuVdd(0));
@@ -312,6 +312,7 @@ static void  board_power_init(void){
 		CONSOLEUtilsPrintf(" Set Core volatage failed r\n");
 		return;	
 	}
+	setup_core_pll();
 }
 
 /*
@@ -482,6 +483,89 @@ static void  board_pll_init(uint8_t  early){
 	}
 }
 
+void setup_mpu_pll(void){
+	uint32_t crystalFreqSel = 0U;
+	uint32_t inputClk = 0U;
+
+	/* Get input clock frequency. */
+	crystalFreqSel = HW_RD_FIELD32_RAW(SOC_CONTROL_REGS + CONTROL_STATUS,
+							CONTROL_STATUS_SYSBOOT1,
+							CONTROL_STATUS_SYSBOOT1_SHIFT);
+
+	switch(crystalFreqSel){
+	case 0U:{
+		inputClk = 19U;
+		break;
+	}
+
+	case 1U: {
+		/*
+		* we are always use Xin clock 24MHz as input clock.
+		*/	
+		inputClk = 24U;
+		break;
+	}
+
+	case 2U:{
+		inputClk = 25U;
+		break;
+	}
+
+	case 3U:{
+		inputClk = 26U;
+		break;
+	}
+
+	default:
+		break;
+    }
+
+	mpu_pll_config(CONFIG_MPU_FREQ_M, inputClk -1, 1);
+	CONSOLEUtilsPrintf("MPU PLL Clock:          [%dMHz]\r\n", CONFIG_MPU_FREQ_M);
+}
+
+void setup_core_pll(void){
+	uint32_t crystalFreqSel = 0U;
+	uint32_t inputClk = 0U;
+
+	/* Get input clock frequency. */
+	crystalFreqSel = HW_RD_FIELD32_RAW(SOC_CONTROL_REGS + CONTROL_STATUS,
+							CONTROL_STATUS_SYSBOOT1,
+							CONTROL_STATUS_SYSBOOT1_SHIFT);
+
+	switch(crystalFreqSel){
+	case 0U:{
+		inputClk = 19U;
+		break;
+	}
+
+	case 1U: {
+		/*
+		* we are always use Xin clock 24MHz as input clock.
+		*/	
+		inputClk = 24U;
+		break;
+	}
+
+	case 2U:{
+		inputClk = 25U;
+		break;
+	}
+
+	case 3U:{
+		inputClk = 26U;
+		break;
+	}
+
+	default:
+		break;
+    }
+
+	core_pll_config(1000, inputClk -1, 5, 4, 2);
+	CONSOLEUtilsPrintf("Core PLL Clock:         [%dMHz]\r\n", 1000);
+}
+
+
 #ifdef PRU_WKUP
 static void PRU_ICSS_PRCM_Enable(void)
 {
@@ -556,7 +640,12 @@ void  board_early_init(void){
 */
 	/* Init the board power. */
 	board_power_init();
+	
+	int i;
+	for(i = 0 ; i < 10000; i++){
+		CONSOLEUtilsPuts("...");
+	}
 	/* later pll setup*/
-	board_pll_init(0);
+	//board_pll_init(0);
 	CONSOLEUtilsPuts("\r\n\r\n");
 }
