@@ -304,7 +304,7 @@ static void  board_power_init(void){
 		CONSOLEUtilsPrintf(" Set MPU volatage failed r\n");
 		return;	
 	}
-	setup_mpu_pll();
+	
 	/* Second, update the CORE voltage. */
 	retVal = PMICSetRailVoltage(PMIC_MODULE_CORE, 
 				PMICGetMpuVdd(0));
@@ -312,7 +312,6 @@ static void  board_power_init(void){
 		CONSOLEUtilsPrintf(" Set Core volatage failed r\n");
 		return;	
 	}
-	setup_core_pll();
 }
 
 /*
@@ -429,9 +428,9 @@ static void  board_pll_init(uint8_t  early){
 	}else{
 		coreDpllMult = 1000U;
 		coreDpllDiv = inputClk -1;
-		coreDpllPostDivM4 = 5U;
-		coreDpllPostDivM5 = 4U;
-		coreDpllPostDivM6 = 2U;
+		coreDpllPostDivM4 = 10U;
+		coreDpllPostDivM5 = 8U;
+		coreDpllPostDivM6 = 4U;
 	}
 
 	if(early){
@@ -561,7 +560,7 @@ void setup_core_pll(void){
 		break;
     }
 
-	core_pll_config(1000, inputClk -1, 5, 4, 2);
+	core_pll_config(1000, inputClk -1, 10, 8, 4);
 	CONSOLEUtilsPrintf("Core PLL Clock:         [%dMHz]\r\n", 1000);
 }
 
@@ -640,12 +639,8 @@ void  board_early_init(void){
 */
 	/* Init the board power. */
 	board_power_init();
-	
-	int i;
-	for(i = 0 ; i < 10000; i++){
-		CONSOLEUtilsPuts("...");
-	}
+
 	/* later pll setup*/
-	//board_pll_init(0);
+	board_pll_init(0);
 	CONSOLEUtilsPuts("\r\n\r\n");
 }

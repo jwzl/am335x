@@ -70,6 +70,16 @@ void i2c_eeprom_read_and_display_task(UArg arg0, UArg arg1);
  **********************************************************************/
 volatile uint32_t g_endTestTriggered = 0;
 
+#define PRM_RSTCTRL			0x44E00F00
+#define PRM_RSTST			0x44E00F08
+#define PRM_RSTCTRL_RESET		0x01
+#define PRM_RSTST_WARM_RESET_MASK	0x232
+
+void  reset_cpu(unsigned long ignored)
+{
+	//writel(PRM_RSTCTRL_RESET, PRM_RSTCTRL);
+	HW_WR_REG32(PRM_RSTCTRL, PRM_RSTCTRL_RESET);
+}
 /**
  *  @brief Function appTasksCreate : Creates multiple application tasks
  *
@@ -100,7 +110,7 @@ void appTasksCreate(void)
     /* Add additional tasks here */
 
     appPrint("\n ======== Application tasks created successfully ========\n");
-
+    reset_cpu(0);
 }
 
 /**
