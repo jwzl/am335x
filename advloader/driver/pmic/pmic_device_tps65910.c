@@ -186,8 +186,10 @@ int32_t PMICDevTps65910SetOutputVoltage(uint32_t instNum,
 	switch(module){
 	case  PMIC_MODULE_MPU:
 		Reg = VDD1_OP_REG;
+		break;
 	case  PMIC_MODULE_CORE:
 		Reg = VDD2_OP_REG;
+		break;
 	}
 
 	/* Select VDDx OP   */
